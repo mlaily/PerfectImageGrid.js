@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Grid</title>
+	<meta charset="utf-8">
+	<script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<style>
+		.imageGrid {
+			background-color: #F5F5F5;
+			border: 1px dashed #999999;
+			max-width: 740px;
+			margin:auto;
+			padding: 10px;
+		}
+		.imageGrid>img {
+			margin: 10px;
+			border: 1px solid black;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="imageGrid">
+		  <img src="images/Autumn_Landscape_ge_bigthumb.jpg"
+		/><img src="images/September_Morning_ge_bigthumb.jpg"
+		/><img src="images/Mudpots_And_Geysers_ge_bigthumb.jpg"
+		/><img src="images/New_Serengeti_ge_bigthumb.jpg"
+		/><img src="images/Backroads_And_Buttes_bigthumb.jpg"
+		/><img src="images/Westward_cp_bigthumb.jpg"
+		/><img src="images/Pigeon_Lake_Sunset_2ge_large.jpg"
+		/><img src="images/Grasslands_Teepee_bigthumb.jpg"
+		/><img src="images/Hail_On_The_Horizon_bigthumb.jpg"
+		/><img src="images/Last_Light_ge_bigthumb.jpg"
+		/><img src="images/Golden_Pond_bigthumb.jpg"
+		/><img src="images/Early_Morning_October_bigthumb.jpg"
+		/><img src="images/Evening_Light_bigthumb.jpg"
+		/><img src="images/Colder_Weather_bigthumb.jpg"
+		/><img src="images/Fly_bigthumb.jpg"
+		/><img src="images/Calm_Waters_bigthumb.jpg"
+		/><img src="images/11000_Feet_bigthumb.jpg"
+		/><img src="images/Frost_And_Sun_ge_bigthumb.jpg"
+		/><img src="images/Forest_Fire_cp_bigthumb.jpg"
+		/><img src="images/Sacred_Ceremony_CP_bigthumb.jpg"
+		/><img src="images/Mountain_Weather_cp_bigthumb.jpg"
+		/><img src="images/Going_Nowhere_cp_bigthumb.jpg"
+		/><img src="images/Fire1_cp_bigthumb.jpg"
+		/><img src="images/Fire_Fighting_cp_bigthumb.jpg"
+		/><img src="images/Bridge_To_The_Old_Country_cp_bigthumb.jpg"
+		/><img src="images/Valley_Of_Bison_bigthumb.jpg"
+		/><img src="images/Thunderstorm_Lowering_bigthumb.jpg"
+		/><img src="images/Rainshaft_bigthumb.jpg"
+		/><img src="images/Rural_Delivery_bigthumb.jpg"
+		/><img src="http://placehold.it/350x150/69D2E7/ffffff" width="350" height="150"
+		/><img src="http://placehold.it/320x180/A7DBD8/ffffff" width="320" height="180" 
+		/><img src="http://placehold.it/320x300/E0E4CC/ffffff" width="320" height="300"
+		/><img src="http://placehold.it/472x500/F38630/ffffff" width="472" height="500"
+		/><img src="http://placehold.it/540x360/FA6900/ffffff" width="540" height="360"
+		/><img src="http://placehold.it/800x600/ECD078/ffffff" width="800" height="600"
+		/><img src="http://placehold.it/400x120/D95B43/ffffff" width="400" height="120"
+		/><img src="http://placehold.it/300x300/C02942/ffffff" width="300" height="300"
+		/><img src="http://placehold.it/320x500/542437/ffffff" width="320" height="500"
+		/><img src="http://placehold.it/450x300/53777A/ffffff" width="450" height="300"
+		/>
+	</div>
+	
+
+<script type='text/javascript'>
+
+function initGrid(container)
+{
+	container.css("position", "relative"); //not static, so that the img are relative to this container
+	container.children("img").each(function() {
+		var $this = $(this);
+		$this.css("position", "absolute");
+		$this.data("width", $this.width());
+		$this.data("height", $this.height());
+	});
+}
+
+function grid(container, round)
+{
+	//optional parameter indicating if the calculated positions should be rounded to the nearest integer.
+	// when true, some rounding errors can be visible and make the images not exactly aligned
+	// when false, the images are perfectly aligned, but can be blurred (especially the borders)
+	if(round === undefined) round = true; 
+    var images = container.children("img");
+	var containerWidth = container.width();
+	var firstItem = images.first();
+	var imgMargin = parseInt(firstItem.css("margin-left"));
+	var imgPadding = parseInt(firstItem.css("padding-left"));
+	var imgBorder = parseInt(firstItem.css("border-left-width"));
+	var totalImgMargin = imgMargin + imgPadding + imgBorder;
+	var currentRowVPos = 0;
+	var currentRowWidth = 0;
+	var currentRowHeight = 0;
+	var currentRowStartIndex = 0;
+	var currentRowImageCount;
+	
+	do
+	{
+		currentRowImageCount = 0;
+		var firstIteration = true;
+
+		//try to fit as many images as possible on the row width
+		// to do so, images are added and their cumulated width (scaled to take their height into account)
+		// checked against the total row width
+
+		for (var i = currentRowStartIndex; i < images.length; i++)
+		{
+			var imageWidth = images.eq(i).data("width");
+			var imageHeight = images.eq(i).data("height");
+
+			if (firstIteration)
+			{
+				currentRowWidth = imageWidth;
+				currentRowHeight = imageHeight;
+				firstIteration = false;
+			}
+			else
+			{
+				var ratio = imageHeight / currentRowHeight;
+				if (ratio < 1.0) //always take the smallest height possible
+				{
+					currentRowHeight = imageHeight;
+					//downscale the previous width
+					currentRowWidth = ratio * currentRowWidth;
+					currentRowWidth += imageWidth;
+				}
+				else if (ratio > 1.0)
+				{
+					currentRowWidth += imageWidth / ratio;
+				}
+				else //equal
+				{
+					currentRowWidth += imageWidth;
+				}
+			}
+
+			currentRowImageCount++;
+			if (currentRowWidth > containerWidth - currentRowImageCount * 2 * totalImgMargin)
+			{
+				break;
+			}
+		}
+
+		//adjust the images sizes to exactly fit the row width
+		// the images are scaled to match the smallest height of the selected images
+		// and then scaled to take the row width into account
+		// the images are never upscaled.
+
+		var rowWidthScaling = 	(currentRowWidth > containerWidth - currentRowImageCount * 2 * totalImgMargin) ?
+								(containerWidth - currentRowImageCount * 2 * totalImgMargin) / currentRowWidth : 1.0;
+
+		var posX = 0;
+		for (var i = currentRowStartIndex, j = 0; i < currentRowStartIndex + currentRowImageCount; i++, j++)
+		{
+			var image = images.eq(i);
+			var ratio = rowWidthScaling * (currentRowHeight / image.data("height"));
+			var newWidth = image.data("width") * ratio;
+			var newHeight = image.data("height") * ratio;
+			if (round)
+			{
+				newWidth = Math.round(newWidth);
+				newHeight = Math.round(newHeight);
+			}
+			image.width(newWidth);
+			image.height(newHeight);
+			
+			image.css({transform: "translate3d(" + posX + "px, " + currentRowVPos + "px, 0px)"});
+			posX += image.width() + 2 * totalImgMargin;
+		}
+
+		//+bottom margin
+		currentRowVPos += totalImgMargin * 2;
+		var toAdd = currentRowHeight * rowWidthScaling;
+		currentRowVPos += round ? Math.round(toAdd) : toAdd;
+		currentRowStartIndex += currentRowImageCount;
+	} while (currentRowStartIndex < images.length);
+	
+	//set the actual container height
+	container.height(currentRowVPos);
+}
+
+$(document).ready(function() {
+	initGrid($(".imageGrid"));
+	grid($(".imageGrid"));
+});
+
+var resizeTimer = null;
+$(window).bind('resize', function() {
+	if (resizeTimer) clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(grid($(".imageGrid")), 200);
+});
+	
+</script>
+</body>
+</html> 
