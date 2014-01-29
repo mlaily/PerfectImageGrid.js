@@ -82,10 +82,10 @@ o        o         o      o     +
 
 <script type='text/javascript'>
 
-function initGrid(container)
+function initGrid(container, items)
 {
 	container.css("position", "relative"); //not static, so that the img are relative to this container
-	container.children("img").each(function() {
+	items.each(function() {
 		var $this = $(this);
 		$this.css("position", "absolute");
 		$this.data("width", $this.width());
@@ -93,13 +93,13 @@ function initGrid(container)
 	});
 }
 
-function grid(container, round)
+function grid(container, items, rounding)
 {
 	//optional parameter indicating if the calculated positions should be rounded to the nearest integer.
 	// when true, some rounding errors can be visible and make the images not exactly aligned
 	// when false, the images are perfectly aligned, but can be blurred (especially the borders)
-	if(round === undefined) round = true; 
-    var images = container.children("img");
+	if(rounding === undefined) rounding = true; 
+    var images = items;
 	var containerWidth = container.width();
 	var firstItem = images.first();
 	var imgMargin = parseInt(firstItem.css("margin-left"));
@@ -174,7 +174,7 @@ function grid(container, round)
 			var ratio = rowWidthScaling * (currentRowHeight / image.data("height"));
 			var newWidth = image.data("width") * ratio;
 			var newHeight = image.data("height") * ratio;
-			if (round)
+			if (rounding)
 			{
 				newWidth = Math.round(newWidth);
 				newHeight = Math.round(newHeight);
@@ -189,7 +189,7 @@ function grid(container, round)
 		//+bottom margin
 		currentRowVPos += totalImgMargin * 2;
 		var toAdd = currentRowHeight * rowWidthScaling;
-		currentRowVPos += round ? Math.round(toAdd) : toAdd;
+		currentRowVPos += rounding ? Math.round(toAdd) : toAdd;
 		currentRowStartIndex += currentRowImageCount;
 	} while (currentRowStartIndex < images.length);
 	
@@ -198,8 +198,8 @@ function grid(container, round)
 }
 
 $(document).ready(function() {
-	initGrid($(".imageGrid"));
-	grid($(".imageGrid"));
+	initGrid($(".imageGrid"), $(".imageGrid img"));
+	grid($(".imageGrid"), $(".imageGrid img"));
 });
 
 var resizeTimer = null;
