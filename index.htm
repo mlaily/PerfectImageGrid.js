@@ -107,7 +107,7 @@ function grid(container, items, rounding)
 	var imgBorder = parseInt(firstItem.css("border-left-width"));
 	var totalImgMargin = imgMargin + imgPadding + imgBorder;
 	var currentRowVPos = 0;
-	var currentRowWidth = 0;
+	var currentRowWidth = 0; //only the images widths, without the margins
 	var currentRowHeight = 0;
 	var currentRowStartIndex = 0;
 	var currentRowImageCount;
@@ -158,6 +158,8 @@ function grid(container, items, rounding)
 				break;
 			}
 		}
+		
+		var isLastRow = currentRowStartIndex + currentRowImageCount == images.length;
 
 		//adjust the images sizes to exactly fit the row width
 		// the images are scaled to match the smallest height of the selected images
@@ -166,8 +168,13 @@ function grid(container, items, rounding)
 
 		var rowWidthScaling = 	(currentRowWidth > containerWidth - currentRowImageCount * 2 * totalImgMargin) ?
 								(containerWidth - currentRowImageCount * 2 * totalImgMargin) / currentRowWidth : 1.0;
+								
+		var actualRowWidth = rowWidthScaling * currentRowWidth + currentRowImageCount * 2 * totalImgMargin;
+		var spaceLeft = containerWidth - actualRowWidth;
 
 		var posX = 0;
+		if (isLastRow) posX += spaceLeft / 2; //center the last row
+		
 		for (var i = currentRowStartIndex, j = 0; i < currentRowStartIndex + currentRowImageCount; i++, j++)
 		{
 			var image = images.eq(i);
